@@ -114,7 +114,49 @@ const loginUser = async function(req, res){
 
 //==========================================================================
 
+let createCompaign = async function (req, res) {
+    try {
+        const requestBody = req.body;
 
+        if (!isValidReqestBody(requestBody)) {
+            return res.status(400).send({ status: false, message: "Invalid request parameter. Please provide compaign details" });   
+        }
+
+        // Object Destructuring 
+        let {id, short_token, name, offers, enabled} = requestBody;
+
+        // Validation 
+        if (!isValid(id)) {
+            return res.status(400).send({ status: false, msg: "Id is required" });   
+        };
+
+        if (!isValid(short_token)) {
+            return res.status(400).send({ status: false, msg: "short_token is required" });    
+        };
+      
+        if (!isValid(name)) {
+            return res.status(400).send({ status: false, msg: "name is require" });     
+        };
+
+        if (!isValid(offers)) {
+            return res.status(400).send({ status: false, msg: "offers is required" })     
+        };
+
+      
+        if (!isValid(enabled)) {
+            return res.status(400).send({ status: false, msg: "True or false is required" });     
+        };
+
+        const compaignData = { id, short_token, name, offers, enabled }
+        const newCompaign = await usersModel.create(compaignData);
+        res.status(201).send({ status: true, message: "compaignData created successfully", data: newCompaign })
+
+    } catch (error) {
+        res.status(500).send({ status: false, message: error.message })
+    }
+}
+
+//========================================== 7 point apis ==================
 
 
 const redirect = async function (req, res){
@@ -122,7 +164,7 @@ const redirect = async function (req, res){
     const click_id = req.query.click_id;
 
     //Find campaign
-    const campaign = await campaignModels.findOne({short_token: short_token});
+    const campaign = await compaignModel.findOne({short_token: short_token});
     //If campaign not found or not enabled, serve error accordingly
     if(!campaign){
           return res.status(404).send({message: "Campaign not found"});
@@ -154,20 +196,22 @@ const redirect = async function (req, res){
 }
 
 
-//================================= 8 Apis =====================
+//================================= 8 point Apis =====================
 
 const toggleCampaign = async function (req, res){
     const id = req.params.id;
+
     const campaign = await compaignModel.findById(id);
     if(!campaign){
           return res.status(404).json({message: "Campaign not found"});
-    }
+    };
+
     campaign.enabled = !campaign.enabled;
-    await campaign.save();
-    return res.status(200).send({message: "Campaign toggled successfully"});
+    const compaign_data = await campaign.save();
+    return res.status(200).send({message: "Campaign toggled successfully", data :compaign_data});
 }
 
 
 
 
-module.exports = { createUser, loginUser,toggleCampaign, redirect };
+module.exports = { createUser, loginUser,createCompaign ,toggleCampaign, redirect };

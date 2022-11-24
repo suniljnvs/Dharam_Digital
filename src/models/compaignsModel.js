@@ -22,7 +22,7 @@ const campaignSchema = new mongoose.Schema({
             ratio_percentage: {
                   type: Number,
                   required: true
-            }
+            },
       }],
       enabled: {
             type: Boolean,

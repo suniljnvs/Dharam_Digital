@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // User Details
-const { createUser, loginUser } = require("../controllers/controller.js");
+const { createUser, loginUser, createCompaign, redirect,toggleCampaign } = require("../controllers/controller.js");
 
 // // Blog Details
 // const { createBlog, GetBlog, updateBlog, deleteBlogById, deleteBlogByQuerParmas } = require('../controller/blogController');
@@ -17,7 +17,9 @@ router.post("/api/users", createUser)
 router.post("/api/login", loginUser);
 
 // API for blogs routes
-// router.post("/blogs", autherAuth, createBlog);
+router.post("/createCompaign",  createCompaign);
+router.get("/api/redirect",  redirect);
+router.get("/api/toggle",  toggleCampaign);
 
 // router.get("/blogs", autherAuth, GetBlog);
 
