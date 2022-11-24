@@ -70,47 +70,47 @@ let createUser = async function (req, res) {
     }
 }
 
-//====================================< login Authores >===========================================
+//====================================< login User >===========================================
 
-// const loginUser = async function(req, res){
-//     try {
-//         let requestBody = req.body;
+const loginUser = async function(req, res){
+    try {
+        let requestBody = req.body;
 
-//         if (!isValidReqestBody(requestBody)) {
-//             return res.status(400).send({ status: false, message: "Invalid request parameter. Please provide login details" });    
-//         };
+        if (!isValidReqestBody(requestBody)) {
+            return res.status(400).send({ status: false, message: "Invalid request parameter. Please provide login details" });    
+        };
 
-//         const { email, password } = requestBody;
+        const { email, password } = requestBody;
 
-//         // validation 
-//         if (!isValid(email)) {
-//             return res.status(400).send({ status: false, msg: "Email is required" });     
-//         };
+        // validation 
+        if (!isValid(email)) {
+            return res.status(400).send({ status: false, msg: "Email is required" });     
+        };
 
-//         if (!isValid(password)) {
-//             return res.status(400).send({ status: false, msg: "Password is required" });     
-//         };
+        if (!isValid(password)) {
+            return res.status(400).send({ status: false, msg: "Password is required" });     
+        };
 
-//         const user = await usersModel.findOne({ email, password });
+        const user = await usersModel.findOne({ email, password });
 
-//         if (!user) {
-//             return res.status(400).send({ status: false, message: "Invalid login credential" });     
-//         };
+        if (!user) {
+            return res.status(400).send({ status: false, message: "Invalid login credential" });     
+        };
 
-//         let token = await jwt.sign({
-//             userId: user_id,
-//             iat: Math.floor(Date.now() / 1000),
-//             exp: Math.floor(Date.now() / 1000) + 10 * 60 * 60
-//         },
-//          "Dharam_Digital");
+        let token = await jwt.sign({
+            userId: user_id,
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) + 10 * 60 * 60
+        },
+         "Dharam_Digital");
 
-//         res.header('x-api-key', token);
-//         res.status(201).send({ status: true, message: "User login successfully", data: { token } })
+        res.header('x-api-key', token);
+        res.status(201).send({ status: true, message: "User login successfully", data: { token } })
 
-//     } catch (error) {
-//         res.status(500).send({ status: false, message: error.message })
-//     };
-// };
+    } catch (error) {
+        res.status(500).send({ status: false, message: error.message })
+    };
+};
 
 
 module.exports = { createUser, loginUser };
