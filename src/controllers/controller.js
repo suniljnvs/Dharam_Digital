@@ -1,4 +1,5 @@
 let usersModel = require("../models/usersModel");
+let compaignModel = require("../models/compaignsModel.js");
 let jwt = require("jsonwebtoken");
 
 
@@ -111,5 +112,62 @@ const loginUser = async function(req, res){
     };
 };
 
+//==========================================================================
 
-module.exports = { createUser, loginUser };
+
+
+
+const redirect = async function (req, res){
+    const short_token = req.query.short_token;
+    const click_id = req.query.click_id;
+
+    //Find campaign
+    const campaign = await campaignModels.findOne({short_token: short_token});
+    //If campaign not found or not enabled, serve error accordingly
+    if(!campaign){
+          return res.status(404).send({message: "Campaign not found"});
+    }
+    if(!campaign.enabled){
+          return res.status(404).send({message: "Campaign not enabled"});
+    }
+    const offers = campaign.offers;
+
+    //Distribute offers in manner that ratio_percentage mentioned in offer object is maintained.
+    let totalRatio = 0;
+    for(let i = 0; i < offers.length; i++){
+          totalRatio += offers[i].ratio_percentage;
+    }
+    let random = Math.floor(Math.random() * totalRatio);
+    let offer_url = "";
+    for(let i = 0; i < offers.length; i++){
+          random -= offers[i].ratio_percentage;
+          if(random < 0){
+                offer_url = offers[i].offer_url;
+                break;
+          }
+    }
+    //Replace macro {click_id} if present in offer_url with value received in click_id query parameter.
+    if(click_id){
+          offer_url = offer_url.replace("{click_id}", click_id);
+    }
+    return res.redirect(offer_url);
+}
+
+
+//================================= 8 Apis =====================
+
+const toggleCampaign = async function (req, res){
+    const id = req.params.id;
+    const campaign = await compaignModel.findById(id);
+    if(!campaign){
+          return res.status(404).json({message: "Campaign not found"});
+    }
+    campaign.enabled = !campaign.enabled;
+    await campaign.save();
+    return res.status(200).send({message: "Campaign toggled successfully"});
+}
+
+
+
+
+module.exports = { createUser, loginUser,toggleCampaign, redirect };
