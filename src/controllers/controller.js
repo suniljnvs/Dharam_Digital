@@ -125,7 +125,7 @@ let createCompaign = async function (req, res) {
         // Object Destructuring 
         let {id, short_token, name, offers, enabled} = requestBody;
 
-        // Validation 
+        // // Validation 
         if (!isValid(id)) {
             return res.status(400).send({ status: false, msg: "Id is required" });   
         };
@@ -142,13 +142,8 @@ let createCompaign = async function (req, res) {
             return res.status(400).send({ status: false, msg: "offers is required" })     
         };
 
-      
-        if (!isValid(enabled)) {
-            return res.status(400).send({ status: false, msg: "True or false is required" });     
-        };
-
-        const compaignData = { id, short_token, name, offers, enabled }
-        const newCompaign = await usersModel.create(compaignData);
+        const compaignData = { id, short_token, name, offers,enabled }
+        const newCompaign = await compaignModel.create(compaignData);
         res.status(201).send({ status: true, message: "compaignData created successfully", data: newCompaign })
 
     } catch (error) {
