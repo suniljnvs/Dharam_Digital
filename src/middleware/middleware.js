@@ -12,11 +12,11 @@ let userAuth = async function(req, res, next) {
 
         let decoded = await jwt.verify(token, "Dharam_Digital");
 
-        // if (!decoded) {
-        //     return res.status(400).send({ status: false, message: "token is invalid" })
-        // }
+        if (!decoded) {
+            return res.status(400).send({ status: false, message: "token is invalid" })
+        }
 
-        // req.userId = decoded.userId
+        req.userId = decoded.userId
 
         next();
 
