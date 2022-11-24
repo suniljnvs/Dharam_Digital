@@ -46,23 +46,22 @@ let createUser = async function (req, res) {
         };
 
         if (!isValid(email)) {
-            return res.status(400).send({ status: false, msg: "Email is required" })
-            
-        }
+            return res.status(400).send({ status: false, msg: "Email is required" })     
+        };
 
         let emailIsAllreadyUsed = await usersModel.findOne({ email }) 
         if (emailIsAllreadyUsed) {
             return res.status(400).send({ status: false, msg: "Try another email,this email is already used "});
             
-        }
+        };
 
         if (!isValid(password)) {
             return res.status(400).send({ status: false, msg: "Password is required" });
             
-        }
+        };
 
         const userData = { title,fname, lname, gender, email, password }
-        const newUser = await authorModel.create(userData);
+        const newUser = await usersModel.create(userData);
         res.status(201).send({ status: true, message: "User created successfully", data: newUser })
 
     } catch (error) {
@@ -98,7 +97,7 @@ const loginUser = async function(req, res){
         };
 
         let token = await jwt.sign({
-            userId: user_id,
+            userId: user._id,
             iat: Math.floor(Date.now() / 1000),
             exp: Math.floor(Date.now() / 1000) + 10 * 60 * 60
         },

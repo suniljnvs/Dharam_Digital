@@ -19,7 +19,7 @@ mongoose.connect("mongodb+srv://sumit1997:47R9ZsJHzXLDslLR@cluster0.zgrvw.mongod
     .catch(error => console.log(error));
 
 
-// app.use('/', route);
+app.use('/', route);
 
 app.listen(process.env.PORT || 5002, function () {
     console.log('Express app running on port ' + (process.env.PORT || 5002));

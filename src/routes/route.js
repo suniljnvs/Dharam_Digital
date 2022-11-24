@@ -2,19 +2,19 @@ const express = require('express');
 
 const router = express.Router();
 
-// Author Details
-// const { createAuthor, loginAuthor } = require("../controller/authorController");
+// User Details
+const { createUser, loginUser } = require("../controllers/controller.js");
 
 // // Blog Details
 // const { createBlog, GetBlog, updateBlog, deleteBlogById, deleteBlogByQuerParmas } = require('../controller/blogController');
 
-// // Check Creadentail and Authorization from middle ware
-// const { autherAuth } = require("../middleware/authorizationMid")
+// Check Creadentail and Authorization from middle ware
+const { userAuth } = require("../middleware/middleware.js")
 
 
-// API for author routes
-// router.post("/authors", createAuthor)
-// router.post("/login", loginAuthor);
+// API for user routes
+router.post("/api/users", createUser)
+router.post("/api/login", loginUser);
 
 // API for blogs routes
 // router.post("/blogs", autherAuth, createBlog);
