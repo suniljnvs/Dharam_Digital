@@ -14,16 +14,16 @@ const campaignSchema = new mongoose.Schema({
             type: String,
             required: true
       },
-    //   offers: [{
-    //         offer_url: {
-    //               type: String,
-    //             //   required: true
-    //         },
-    //         ratio_percentage: {
-    //               type: Number,
-    //             //   required: true
-    //         },
-    //   }],
+      offers: [{
+            offer_url: {
+                  type: String,
+                //   required: true
+            },
+            ratio_percentage: {
+                  type: Number,
+                //   required: true
+            },
+      }],
       enabled: {
             type: Boolean,
             required: true

@@ -14,7 +14,7 @@ const isValidReqestBody = function (requestBody) {
     return Object.keys(requestBody).length > 0;
 }
 
-//=================================================================================================
+//========================================= 3rd point api ========================================================
 
 
 let createUser = async function (req, res) {
@@ -22,8 +22,7 @@ let createUser = async function (req, res) {
         const requestBody = req.body;
 
         if (!isValidReqestBody(requestBody)) {
-            return res.status(400).send({ status: false, message: "Invalid request parameter. Please provide user details" });
-            
+            return res.status(400).send({ status: false, message: "Invalid request parameter. Please provide user details" });       
         }
 
         // Object Destructuring 
@@ -32,18 +31,15 @@ let createUser = async function (req, res) {
         // Validation 
 
         if (!isValid(title)) {
-            return res.status(400).send({ status: false, msg: "Title is required" });
-           
+            return res.status(400).send({ status: false, msg: "Title is required" });   
         };
 
         if (!isValid(fname)) {
-            return res.status(400).send({ status: false, msg: "First name is required" });
-            
+            return res.status(400).send({ status: false, msg: "First name is required" });     
         };
       
         if (!isValid(gender)) {
-            return res.status(400).send({ status: false, msg: "gender should be among  Male, female, Other" });
-            
+            return res.status(400).send({ status: false, msg: "gender should be among  Male, female, Other" });   
         };
 
         if (!isValid(email)) {
@@ -52,13 +48,11 @@ let createUser = async function (req, res) {
 
         let emailIsAllreadyUsed = await usersModel.findOne({ email }) 
         if (emailIsAllreadyUsed) {
-            return res.status(400).send({ status: false, msg: "Try another email,this email is already used "});
-            
+            return res.status(400).send({ status: false, msg: "Try another email,this email is already used "});   
         };
 
         if (!isValid(password)) {
-            return res.status(400).send({ status: false, msg: "Password is required" });
-            
+            return res.status(400).send({ status: false, msg: "Password is required" });     
         };
 
         const userData = { title,fname, lname, gender, email, password }
@@ -70,7 +64,7 @@ let createUser = async function (req, res) {
     }
 }
 
-//====================================< login User >===========================================
+//==================================== 4th point api ===========================================
 
 const loginUser = async function(req, res){
     try {
@@ -112,7 +106,7 @@ const loginUser = async function(req, res){
     };
 };
 
-//==========================================================================
+//========================================== 6th point api ================================
 
 let createCompaign = async function (req, res) {
     try {
@@ -123,9 +117,19 @@ let createCompaign = async function (req, res) {
         }
 
         // Object Destructuring 
-        let {id, short_token, name, offers, enabled} = requestBody;
+        let {id,userId, short_token, name, offers, enabled} = requestBody;
 
         // // Validation 
+
+        let userDetails = await usersModel.findById({ _id: userId });
+        if (!userDetails) {
+            return res.status(404).send({ status: false, msg: "User does not exists" });
+        }
+
+        if (userId != req.userId) {
+            return res.status(403).send({ status: false, message: "You Are Not Unauthorized" });
+        }
+
         if (!isValid(id)) {
             return res.status(400).send({ status: false, msg: "Id is required" });   
         };
@@ -142,8 +146,26 @@ let createCompaign = async function (req, res) {
             return res.status(400).send({ status: false, msg: "offers is required" })     
         };
 
-        const compaignData = { id, short_token, name, offers,enabled }
-        const newCompaign = await compaignModel.create(compaignData);
+        // if (Array.isArray(offers)) {
+        //     if (offers.length == 0) {
+        //         return res.status(400).send({ status: false, message: "offers should not be empty" });
+        //     }
+        // }
+
+        // if (Array.isArray(offers)) {
+        //     for (let i = 0; i < offers.length; i++) {
+        //         if (!isValid(offers[i])) {
+        //             return res.status(400).send({ status: false, message: "Please enter the offers" });
+        //         }
+        //     }
+        // }
+
+        let compaignData = { id, short_token, name, offers,enabled }
+        
+
+        //compaignData = JSON.parse(JSON.stringify(compaignData));
+        
+        let newCompaign = await compaignModel.create(compaignData);
         res.status(201).send({ status: true, message: "compaignData created successfully", data: newCompaign })
 
     } catch (error) {
@@ -151,16 +173,17 @@ let createCompaign = async function (req, res) {
     }
 }
 
-//========================================== 7 point apis ==================
+//========================================== 7th point apis ==================
 
 
 const redirect = async function (req, res){
     const short_token = req.query.short_token;
     const click_id = req.query.click_id;
+    
 
     //Find campaign
     const campaign = await compaignModel.findOne({short_token: short_token});
-    //If campaign not found or not enabled, serve error accordingly
+
     if(!campaign){
           return res.status(404).send({message: "Campaign not found"});
     }
@@ -168,8 +191,8 @@ const redirect = async function (req, res){
           return res.status(404).send({message: "Campaign not enabled"});
     }
     const offers = campaign.offers;
+    // console.log(typeof(offers))
 
-    //Distribute offers in manner that ratio_percentage mentioned in offer object is maintained.
     let totalRatio = 0;
     for(let i = 0; i < offers.length; i++){
           totalRatio += offers[i].ratio_percentage;
@@ -183,29 +206,29 @@ const redirect = async function (req, res){
                 break;
           }
     }
-    //Replace macro {click_id} if present in offer_url with value received in click_id query parameter.
+    
     if(click_id){
           offer_url = offer_url.replace("{click_id}", click_id);
     }
-    return res.redirect(offer_url);
+    return res.status(200).redirect(offers);
 }
 
 
-//================================= 8 point Apis =====================
+//================================= 8th point Apis ========================
 
 const toggleCampaign = async function (req, res){
-    const id = req.params.id;
+    const id = req.params._id;
 
+    
     const campaign = await compaignModel.findById(id);
     if(!campaign){
-          return res.status(404).json({message: "Campaign not found"});
+          return res.status(404).send({message: "Campaign not found"});
     };
 
     campaign.enabled = !campaign.enabled;
     const compaign_data = await campaign.save();
     return res.status(200).send({message: "Campaign toggled successfully", data :compaign_data});
 }
-
 
 
 
